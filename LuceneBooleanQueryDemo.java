@@ -1,4 +1,9 @@
-package examples;
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package Default;
 
 import java.io.IOException;
 
@@ -15,16 +20,14 @@ import org.apache.lucene.search.BooleanQuery;
 import org.apache.lucene.search.TopDocs;
 
 public class LuceneBooleanQueryDemo {
-	
-   String indexDir = "C://LuceneData/example_index_lucene";
-   String dataDir = "C://LuceneData/example_corpus.gz";
+
    Searcher searcher;
 
    public static void main(String[] args) {
       LuceneBooleanQueryDemo tester;
       try {
          tester = new LuceneBooleanQueryDemo();
-         tester.searchUsingBooleanQuery("record2","record1");
+         tester.searchUsingBooleanQuery("have","interactively");
       } catch (IOException e) {
          e.printStackTrace();
       } catch (ParseException e) {
@@ -34,29 +37,35 @@ public class LuceneBooleanQueryDemo {
 
    private void searchUsingBooleanQuery(String searchQuery1,
       String searchQuery2)throws IOException, ParseException {
-      searcher = new Searcher(indexDir);
+       
+      searcher = new Searcher();
+      
       long startTime = System.currentTimeMillis();
-      String FILE_PATH = "C://LuceneData/bool";
-      String FILE_NAME = "C://LuceneData//bool/test.txt";
+
       
       //create a term to search file name
-      Term term1 = new Term(dataDir, searchQuery1);
+      Term term1 = new Term("text", searchQuery1);
       // Term term1 = new Term("test");
       //create the term query object
       Query query1 = new TermQuery(term1);
 
-      Term term2 = new Term(dataDir, searchQuery2);
+      Term term2 = new Term("text", searchQuery2);
       //Term term2 = new Term("test2");
       //create the term query object
       Query query2 = new PrefixQuery(term2);
               
       
-      BooleanQuery query = new BooleanQuery();
+     BooleanQuery query = new BooleanQuery.Builder()
+        .add(query1, BooleanClause.Occur.MUST) 
+        //.add(optionalQuery, BooleanClause.Occur.SHOULD) 
+        .add(query2, BooleanClause.Occur.MUST_NOT) 
+        .build();
+               
       
       
       
-      query.add(query1, BooleanClause.Occur.MUST);
-      query.add(query1, BooleanClause.Occur.MUST_NOT);  
+     // query.add(query1, BooleanClause.Occur.MUST);
+    //  query.add(query1, BooleanClause.Occur.MUST_NOT);  
       
       //do the search
       TopDocs hits = searcher.search(query);
@@ -66,7 +75,7 @@ public class LuceneBooleanQueryDemo {
             " documents found. Time :" + (endTime - startTime) + "ms");
       for(ScoreDoc scoreDoc : hits.scoreDocs) {
          Document doc = searcher.getDocument(scoreDoc);
-         System.out.println("File: "+ doc.get(FILE_PATH));
+         System.out.println("File: "+ doc.get("docno"));
       }
       searcher.close();
    }

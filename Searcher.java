@@ -1,4 +1,9 @@
-package examples;
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package Default;
 
 import java.io.File;
 import java.io.IOException;
@@ -27,7 +32,7 @@ public class Searcher {
     IndexSearcher indexSearcher;
     QueryParser queryParser;
     Query query;
-    String pathIndex = "C://LuceneData/example_index_lucene";
+    String pathIndex = Constants.INDEX_PATH;
     Analyzer analyzer = new Analyzer() {
         @Override
         protected Analyzer.TokenStreamComponents createComponents(String fieldName) {
@@ -46,11 +51,12 @@ public class Searcher {
         }
     };
 
-    public Searcher(String indexDirectoryPath) throws IOException {
+    IndexReader index ;
+    public Searcher() throws IOException {
         //Directory indexDirectory = FSDirectory.open(new File(indexDirectoryPath));
         Directory indexDirectory = FSDirectory.open(new File(pathIndex).toPath());
         //indexSearcher = new IndexSearcher(indexDirectory);
-        IndexReader index = DirectoryReader.open(indexDirectory);
+        index = DirectoryReader.open(indexDirectory);
         indexSearcher = new IndexSearcher(index);
         //queryParser = new QueryParser(Version.LUCENE_36, LuceneConstants.CONTENTS,
         // new StandardAnalyzer(Version.LUCENE_36));
@@ -61,7 +67,7 @@ public class Searcher {
     public TopDocs search(Query query)
             throws IOException, ParseException {
        // query = queryParser.parse(searchQuery);
-        return indexSearcher.search(query, 10);
+        return indexSearcher.search(query, 50);
     }
 
 //    public TopDocs search(Query query) throws IOException, ParseException {
@@ -73,7 +79,7 @@ public class Searcher {
         return indexSearcher.doc(scoreDoc.doc);
     }
 
-//    public void close() throws IOException {
-//        indexSearcher.close();
-//    }
+    public void close() throws IOException {
+        index.close();
+    }
 }
